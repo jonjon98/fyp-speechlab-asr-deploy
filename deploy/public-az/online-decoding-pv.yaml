@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: online-models-pv
+  namespace: livestream-decoding
+  labels:
+    usage: online-models-pv
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadOnlyMany
+  persistentVolumeReclaimPolicy: Retain
+  #storageClassName: azurefile
+  azureFile:
+    secretName: models-pub-secret
+    shareName: online-models
+    readOnly: true
+  mountOptions:
+  - dir_mode=0777
+  - file_mode=0777
+  - uid=1000
+  - gid=1000
+  - mfsymlinks
+  - nobrl

@@ -1,0 +1,35 @@
+{{- if .Values.master.enabled -}}
+The LivestreamDecoder master can be accessed via port {{ .Values.master.service.servicePort }} on the following DNS name from within your cluster:
+{{ template "livestreamdecoding.master.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
+
+{{ if .Values.master.ingress.enabled -}}
+From outside the cluster, the master URL(s) are:
+{{- range .Values.master.ingress.hosts }}
+http://{{ . }}
+{{- end }}
+{{- else }}
+Get the LivestreamDecoder master URL by running these commands in the same shell:
+{{- if contains "NodePort" .Values.master.service.type }}
+  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ template "livestreamdecoding.master.fullname" . }})
+  export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo http://$NODE_IP:$NODE_PORT
+{{- else if contains "LoadBalancer" .Values.master.service.type }}
+  NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+        You can watch the status of by running 'kubectl get svc --namespace {{ .Release.Namespace }} -w {{ template "livestreamdecoding.master.fullname" . }}'
+
+  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ template "livestreamdecoding.master.fullname" . }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+  echo http://$SERVICE_IP:{{ .Values.master.service.servicePort }}
+{{- else if contains "ClusterIP"  .Values.master.service.type }}
+  export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app={{ template "livestreamdecoding.name" . }},component={{ .Values.master.name }}" -o jsonpath="{.items[0].metadata.name}")
+  kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8080
+{{- end }}
+{{- end }}
+
+{{- if .Values.master.persistentVolume.enabled }}
+{{- else }}
+#################################################################################
+######   WARNING: Persistence is disabled!!! You will lose your data when   #####
+######            the master pod is terminated.                             #####
+#################################################################################
+{{- end }}
+{{- end }}

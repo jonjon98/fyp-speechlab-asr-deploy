@@ -1,0 +1,41 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: onlineasr-ingress
+  namespace: livestream-decoding
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/proxy-body-size: 500M # allow upload to 500Mb per request
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    # nginx.ingress.kubernetes.io/rewrite-target: /$1
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  rules:
+    - host: online.speechlab.sg
+      http:
+        paths:
+          - backend:
+              service:
+                name: livestream-decoding-master
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix
+    - host: twilioconnector.speechlab.sg
+      http:
+        paths:
+          - backend:
+              service:
+                name: livestream-decoding-twilioconnector
+                port:
+                  number: 3000
+            path: /
+            pathType: Prefix
+  # This section is only required if TLS is to be enabled for the Ingress
+  tls:
+    - hosts:
+        - online.speechlab.sg
+        - twilioconnector.speechlab.sg
+      secretName: onlineasr-tls

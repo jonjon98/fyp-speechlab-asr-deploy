@@ -1,0 +1,51 @@
+{{- if .Values.master.enabled -}}
+{{- if .Values.master.ingress.enabled -}}
+---
+{{- $ingressApiIsStable := eq (include "ingress.isStable" .) "true" -}}
+{{- $ingressSupportsPathType := eq (include "ingress.supportsPathType" .) "true" -}}
+{{- $releaseName := .Release.Name -}}
+{{- $serviceName := include "livestreamdecoding.master.fullname" . }}
+{{- $servicePort := .Values.master.service.servicePort -}}
+{{- $ingressPath := .Values.master.ingress.path -}}
+{{- $ingressPathType := .Values.master.ingress.pathType -}}
+{{- $extraPaths := .Values.master.ingress.extraPaths -}}
+apiVersion: {{ template "ingress.apiVersion" . }}
+kind: Ingress
+metadata:
+{{- if .Values.master.ingress.annotations }}
+  annotations:
+{{ toYaml .Values.master.ingress.annotations | indent 4 }}
+{{- end }}
+  name: {{ template "livestreamdecoding.master.fullname" . }}
+{{ include "livestreamdecoding.namespace" . | indent 2 }}
+spec:
+  rules:
+  {{- range .Values.master.ingress.hosts }}
+    {{- $url := splitList "/" . }}
+    - host: {{ first $url }}
+      http:
+        paths:
+{{ if $extraPaths }}
+{{ toYaml $extraPaths | indent 10 }}
+{{- end }}
+          - path: {{ $ingressPath }}
+            {{- if $ingressSupportsPathType }}
+            pathType: {{ $ingressPathType }}
+            {{- end }}
+            backend:
+              {{- if $ingressApiIsStable }}
+              service:
+                name: {{ $serviceName }}
+                port:
+                  number: {{ $servicePort }}
+              {{- else }}
+              serviceName: {{ $serviceName }}
+              servicePort: {{ $servicePort }}
+              {{- end }}
+  {{- end -}}
+{{- if .Values.master.ingress.tls }}
+  tls:
+{{ toYaml .Values.master.ingress.tls | indent 4 }}
+  {{- end -}}
+{{- end -}}
+{{- end -}}

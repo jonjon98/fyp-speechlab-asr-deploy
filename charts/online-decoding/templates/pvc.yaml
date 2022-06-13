@@ -1,0 +1,73 @@
+{{- if .Values.worker.enabled -}}
+{{- if .Values.worker.persistentVolume.enabled -}}
+---
+{{- if not .Values.worker.persistentVolume.existingClaim -}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  {{- if .Values.worker.persistentVolume.annotations }}
+  annotations:
+{{ toYaml .Values.worker.persistentVolume.annotations | indent 4 }}
+  {{- end }}
+  labels:
+    {{- include "livestreamdecoding.worker.labels" . | nindent 4 }}
+  name: {{ template "livestreamdecoding.worker.fullname" . }}
+{{ include "livestreamdecoding.namespace" . | indent 2 }}
+spec:
+  accessModes:
+{{ toYaml .Values.worker.persistentVolume.accessModes | indent 4 }}
+{{- if .Values.worker.persistentVolume.storageClass }}
+{{- if (eq "-" .Values.worker.persistentVolume.storageClass) }}
+  storageClassName: ""
+{{- else }}
+  storageClassName: "{{ .Values.worker.persistentVolume.storageClass }}"
+{{- end }}
+{{- end }}
+{{- if .Values.worker.persistentVolume.volumeBindingMode }}
+  volumeBindingModeName: "{{ .Values.worker.persistentVolume.volumeBindingMode }}"
+{{- end }}
+  resources:
+    requests:
+      storage: "{{ .Values.worker.persistentVolume.size }}"
+  selector:
+    matchLabels:
+{{ toYaml .Values.worker.persistentVolume.matchLabels | indent 6 }}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+
+{{- if .Values.master.enabled -}}
+{{- if .Values.master.persistentVolume.enabled -}}
+---
+{{- if not .Values.master.persistentVolume.existingClaim -}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  {{- if .Values.master.persistentVolume.annotations }}
+  annotations:
+{{ toYaml .Values.master.persistentVolume.annotations | indent 4 }}
+  {{- end }}
+  labels:
+    {{- include "livestreamdecoding.master.labels" . | nindent 4 }}
+  name: {{ template "livestreamdecoding.master.fullname" . }}
+{{ include "livestreamdecoding.namespace" . | indent 2 }}
+spec:
+  accessModes:
+{{ toYaml .Values.master.persistentVolume.accessModes | indent 4 }}
+{{- if .Values.master.persistentVolume.storageClass }}
+{{- if (eq "-" .Values.master.persistentVolume.storageClass) }}
+  storageClassName: ""
+{{- else }}
+  storageClassName: "{{ .Values.master.persistentVolume.storageClass }}"
+{{- end }}
+{{- end }}
+{{- if .Values.master.persistentVolume.volumeBindingMode }}
+  volumeBindingModeName: "{{ .Values.master.persistentVolume.volumeBindingMode }}"
+{{- end }}
+  resources:
+    requests:
+      storage: "{{ .Values.master.persistentVolume.size }}"
+{{- end -}}
+{{- end -}}
+{{- end -}}

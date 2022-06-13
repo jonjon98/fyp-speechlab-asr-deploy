@@ -1,0 +1,403 @@
+namespace: livestream-decoding
+team: devops
+
+rbac:
+  create: true
+
+podSecurityPolicy:
+  enabled: false
+
+imagePullSecrets:
+ - name: "ntuspeechlab-github-cr"
+
+nameOverride: ""
+fullnameOverride: ""
+
+
+## Define serviceAccount names for components. Defaults to component's fully qualified name.
+##
+serviceAccounts:
+  helpme:
+    create: false
+    name:
+    annotations: {}
+
+models:
+  english: 1
+  mandarin: 1
+
+master:
+  ## Livestream Server container
+  enabled: true
+  ## Livestream Server container image
+  ##
+  image:
+    repository: ghcr.io/ntuspeechlab/decoding-sdk
+    tag: "1.0.0"
+    pullPolicy: Always
+  ## Livestream Server priorityClassName
+  ##
+  priorityClassName: ""
+
+  ## Additional master container environment variables
+  ## 
+  ## You specify this manually like you would a raw deployment manifest.
+  ## This means you can bind in environment variables from secrets.
+  ##
+  ## e.g. static environment variable:
+  ##  - name: DEMO_GREETING
+  ##    value: "Hello from the environment"
+  ##
+  ## e.g. secret environment variable:
+  ## - name: USERNAME
+  ##   valueFrom:
+  ##     secretKeyRef:
+  ##       name: mysecret
+  ##       key: username
+  env: []
+
+  command: ["/tini", "--", "/home/speechuser/opt/start_master.sh"]
+
+  extraFlags:
+    # - web.enable-lifecycle
+
+  ## Additional Livestream Server container arguments
+  ##
+  extraArgs: {}
+
+  ## Additional InitContainers to initialize the pod
+  ##
+  extraInitContainers: []
+  ## Livestream Master Server Strategy type
+  # strategy:
+  #   type: Recreate
+  
+  # nodeSelector:
+  #   type: app
+  deploymentAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/path: /metrics
+    prometheus.io/port: "8080"
+
+  persistentVolume:
+    ## If true, Livestream Server will create/use a Persistent Volume Claim
+    ## If false, use emptyDir
+    ##
+    enabled: false
+    accessModes:
+      - ReadWriteOnce
+    annotations: {}
+    matchLabels:
+      usage: asr-online-models-az
+    existingClaim: ""
+    mountPath: /home/speechuser/opt/models
+    size: 20Gi
+    ## Livestream Server data Persistent Volume Storage Class
+    ## If defined, storageClassName: <storageClass>
+    ## If set to "-", storageClassName: "", which disables dynamic provisioning
+    ## If undefined (the default) or set to null, no storageClassName spec is
+    ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+    ##   GKE, AWS & OpenStack)
+    ##
+    storageClass: "azurefile"
+
+    ## Livestream Server data Persistent Volume Binding Mode
+    ## If defined, volumeBindingMode: <volumeBindingMode>
+    ## If undefined (the default) or set to null, no volumeBindingMode spec is
+    ##   set, choosing the default mode.
+    ##
+    # volumeBindingMode: ""
+
+    ## Subdirectory of Livestream Server data Persistent Volume to mount
+    ## Useful if the volume's root directory is not empty
+    ##
+    subPath: ""
+
+  emptyDir:
+    ## Livestream Server emptyDir volume size limit
+    ##
+    sizeLimit: ""
+
+  ## Livestream Server Worker container volume mounts
+  ##
+  volumeMounts: []
+  volumes: []
+
+  ## PodDisruptionBudget settings
+  ## ref: https://kubernetes.io/docs/concepts/workloads/pods/disruptions/
+  ##
+  podDisruptionBudget:
+    enabled: false
+    maxUnavailable: 1
+
+  ## Use a StatefulSet if replicaCount needs to be greater than 1 (see below)
+  ##
+  replicaCount: 1
+
+  ## Livestream Server resource requests and limits
+  ## Ref: http://kubernetes.io/docs/user-guide/compute-resources/
+  ##
+  resources:
+    limits:
+      memory: 2Gi
+    requests:
+      cpu: 1000m
+      memory: 2Gi
+
+  securityContext: {}
+    # runAsUser: 65534
+    # runAsNonRoot: true
+    # runAsGroup: 65534
+    # fsGroup: 65534
+    # privileged: true
+    # capabilities:
+    #   add: ["SYS_ADMIN"]
+
+  service:
+    annotations: {}
+    labels: {}
+
+    servicePort: 80
+    targetPort: 8080
+    protocol: TCP
+    name: http
+    sessionAffinity: None
+    type: ClusterIP
+
+  ingress:
+    ## If true, Livestream Server Ingress will be created
+    ##
+    enabled: false
+
+    # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
+    # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
+    # ingressClassName: nginx
+
+    ## Livestream Server Ingress annotations
+    ##
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      cert-manager.io/cluster-issuer: "letsencrypt-prod"
+
+    ## Livestream Server Ingress additional labels
+    ##
+    extraLabels: {}
+
+    ## Livestream Server Ingress hostnames with optional path
+    ## Must be provided if Ingress is enabled
+    ##
+    hosts:
+      - online.speechlab.sg
+
+    path: /
+
+    # pathType is only for k8s >= 1.18
+    pathType: Prefix
+
+    ## Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
+    extraPaths: []
+    # - path: /*
+    #   backend:
+    #     serviceName: ssl-redirect
+    #     servicePort: use-annotation
+
+    ## Livestream Server Ingress TLS configuration
+    ## Secrets must be manually created in the namespace
+    ##
+    tls:
+      - hosts:
+          - livestream-decoding.speechlab.sg
+        secretName: livestream-decoding-tls
+
+
+worker:
+  ## Livestream Hotword decoder container
+  enabled: true
+  ## Livestream Hotword Decoder container image
+  ##
+  image:
+    repository: ghcr.io/ntuspeechlab/decoding-sdk
+    tag: "1.0"
+    pullPolicy: Always
+
+  ## Livestream Hotword Decoder priorityClassName
+  ##
+  priorityClassName: ""
+
+  ## Additional Hotword Decoder container environment variables
+  ## 
+  ## You specify this manually like you would a raw deployment manifest.
+  ## This means you can bind in environment variables from secrets.
+  ##
+  ## e.g. static environment variable:
+  ##  - name: DEMO_GREETING
+  ##    value: "Hello from the environment"
+  ##
+  ## e.g. secret environment variable:
+  ## - name: USERNAME
+  ##   valueFrom:
+  ##     secretKeyRef:
+  ##       name: mysecret
+  ##       key: username
+  env: []
+
+  command: ["/tini", "--", "/home/speechuser/start_worker.sh"]
+  extraFlags:
+    # - web.enable-lifecycle
+
+  ## Additional Livestream Hotword Decoder container arguments
+  ##
+  extraArgs: {}
+
+  ## Additional InitContainers to initialize the pod
+  ##
+  extraInitContainers: []
+  ## Livestream Hotword Decoder Strategy type
+  # strategy:
+  #   type: Recreate
+
+  # nodeSelector:
+  #   type: app
+  deploymentAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/path: /metrics
+    prometheus.io/port: "8080"
+
+  persistentVolume:
+    ## If true, Livestream Hotword Decoder will create/use a Persistent Volume Claim
+    ## If false, use emptyDir
+    ##
+    enabled: true
+    accessModes:
+      - ReadOnlyMany
+    annotations: {}
+    matchLabels:
+      usage: online-models-pv
+    existingClaim: ""
+    mountPath: /home/speechuser/opt/models
+    size: 20Gi
+    ## Livestream Hotword Decoder data Persistent Volume Storage Class
+    ## If defined, storageClassName: <storageClass>
+    ## If set to "-", storageClassName: "", which disables dynamic provisioning
+    ## If undefined (the default) or set to null, no storageClassName spec is
+    ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+    ##   GKE, AWS & OpenStack)
+    ##
+    # storageClass: "-"
+
+    ## Livestream Hotword Decoder data Persistent Volume Binding Mode
+    ## If defined, volumeBindingMode: <volumeBindingMode>
+    ## If undefined (the default) or set to null, no volumeBindingMode spec is
+    ##   set, choosing the default mode.
+    ##
+    storageClass: "azurefile"
+
+    ## Subdirectory of Livestream Hotword Decoder data Persistent Volume to mount
+    ## Useful if the volume's root directory is not empty
+    ##
+    subPath: ""
+  emptyDir:
+    ## Livestream Hotword Decoder emptyDir volume size limit
+    ##
+    sizeLimit: ""
+
+  ## Livestream Hotword Decoder container volume mounts
+  ##
+  volumeMounts:
+    # # Using AWS EFS
+    # - name: models-efs
+    #   mountPath: /home/speechuser/opt/models
+    # # Using AzureFiles
+    - name: models-azurefiles
+      mountPath: /home/speechuser/opt/models
+
+  volumes:
+    # # Using AWS EFS
+    # - name: models-efs
+    #   persistentVolumeClaim:
+    #     claimName: online-models-claim
+    # # Using AzureFiles
+    - name: models-azurefiles
+      azureFile:
+        secretName: models-files-secret
+        shareName: online-models
+        readOnly: true
+
+  ## PodDisruptionBudget settings
+  ## ref: https://kubernetes.io/docs/concepts/workloads/pods/disruptions/
+  ##
+  podDisruptionBudget:
+    enabled: false
+    maxUnavailable: 1
+
+  ## Use a StatefulSet if replicaCount needs to be greater than 1 (see below)
+  ##
+  replicaCount: 1
+
+  ## Livestream Hotword Decoder resource requests and limits
+  ## Ref: http://kubernetes.io/docs/user-guide/compute-resources/
+  ##
+  resources:
+    limits:
+      memory: 6Gi
+    requests:
+      cpu: 500m
+      memory: 6Gi
+
+  # securityContext:
+  #   runAsUser: 65534
+  #   runAsNonRoot: true
+  #   runAsGroup: 65534
+  #   fsGroup: 65534
+
+  service:
+    annotations: {}
+    labels: {}
+
+    servicePort: 8000
+    targetPort: 8000
+    protocol: TCP
+    name: http
+    sessionAffinity: None
+    type: ClusterIP
+
+  ingress:
+    ## If true, Livestream Hotword Decoder Ingress will be created
+    ##
+    enabled: false
+
+    # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
+    # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
+    # ingressClassName: nginx
+
+    ## Livestream Hotword Decoder Ingress annotations
+    ##
+    annotations: {}
+
+    ## Livestream Hotword Decoder Ingress additional labels
+    ##
+    extraLabels: {}
+
+    ## Livestream Hotword Decoder Ingress hostnames with optional path
+    ## Must be provided if Ingress is enabled
+    ##
+    hosts: []
+
+    path: /
+
+    # pathType is only for k8s >= 1.18
+    pathType: Prefix
+
+    ## Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
+    extraPaths: []
+    # - path: /*
+    #   backend:
+    #     serviceName: ssl-redirect
+    #     servicePort: use-annotation
+
+    ## Livestream Hotword Decoder Ingress TLS configuration
+    ## Secrets must be manually created in the namespace
+    ##
+    tls: []
+
+

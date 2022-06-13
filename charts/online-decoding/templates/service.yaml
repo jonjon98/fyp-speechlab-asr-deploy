@@ -1,0 +1,20 @@
+---
+apiVersion: {{ template "livestreamdecoding.service.apiVersion" . }}
+kind: Service
+metadata:
+  name: {{ template "livestreamdecoding.master.fullname" . }}
+{{ include "livestreamdecoding.namespace" . | indent 2 }}
+  labels:
+{{- include "livestreamdecoding.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.master.service.type }}
+  ports:
+    - port: {{ .Values.master.service.servicePort }}
+{{- if eq .Values.master.service.type "ClusterIP" }}
+      targetPort: {{ .Values.master.service.targetPort }}
+{{- end }}
+      protocol: {{ .Values.master.service.protocol }}
+{{- if eq .Values.master.service.type "ClusterIP" }}
+      name: {{ .Values.master.service.name }}
+{{- end }}
+  selector: {{- include "livestreamdecoding.master.matchLabels" . | nindent 4 }}

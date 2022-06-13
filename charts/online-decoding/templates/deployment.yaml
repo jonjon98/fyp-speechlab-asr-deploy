@@ -1,0 +1,207 @@
+{{- $dot := . }}
+{{- range $modelname, $replicas := .Values.models }}
+---
+apiVersion: {{ template "livestreamdecoding.deployment.apiVersion" . }}
+kind: Deployment
+metadata:
+  name: {{ template "livestreamdecoding.worker.fullname" $dot }}-{{ $modelname | lower | replace "_" "-" }}
+{{ include "livestreamdecoding.namespace" $dot | indent 2 }}
+  labels:
+    {{- include "livestreamdecoding.worker.labels" $dot | nindent 4 }}
+{{- if $.Values.worker.deploymentAnnotations }}
+  annotations: {{ toYaml $.Values.worker.deploymentAnnotations | nindent 4 }}
+{{- end }}
+spec:
+  replicas: {{ $replicas }}
+  {{- if $.Values.worker.strategy }}
+  strategy:
+{{ toYaml $.Values.worker.strategy | trim | indent 4 }}
+    {{ if eq $.Values.worker.strategy.type "Recreate" }}rollingUpdate: null{{ end }}
+{{- end }}
+  selector:
+    matchLabels:
+      {{- include "livestreamdecoding.worker.matchLabels" $dot | nindent 6 }}
+  template:
+    metadata:
+    {{- if $.Values.worker.podAnnotations }}
+      annotations:
+        {{ toYaml $.Values.worker.podAnnotations | nindent 8 }}
+    {{- end }}
+      labels:
+        {{- include "livestreamdecoding.worker.matchLabels" $dot | nindent 8 }}
+        {{- if $.Values.worker.podLabels}}
+        {{ toYaml $.Values.worker.podLabels | nindent 8 }}
+        {{- end}}
+    spec:
+      {{- if $.Values.worker.extraInitContainers }}
+      initContainers:
+{{ toYaml $.Values.worker.extraInitContainers | indent 8 }}
+      {{- end }}
+      {{- if $.Values.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml $.Values.imagePullSecrets | indent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ template "livestreamdecoding.worker.fullname" $dot }}
+          image: "{{ $.Values.worker.image.repository }}:{{ $.Values.worker.image.tag }}"
+          imagePullPolicy: "{{ $.Values.worker.image.pullPolicy }}"
+          envFrom:
+            - secretRef:
+                name: online-asr-secret
+          {{- if $.Values.worker.command }}
+          command:
+{{ toYaml $.Values.worker.command | indent 12}}
+          {{- end }}
+          env:
+          {{- if $.Values.worker.env }}
+{{ toYaml $.Values.worker.env | indent 12}}
+          {{- end }}
+            - name: MODEL_DIR
+              value: {{ $modelname | quote }}
+          {{- if $.Values.worker.args }}
+          args:
+{{ toYaml $.Values.worker.args | indent 12}}
+          {{- end }}
+          resources: 
+{{ toYaml $.Values.worker.resources | indent 12 }}
+          volumeMounts: {{- toYaml $.Values.worker.volumeMounts | nindent 12 }}
+      volumes:
+{{ toYaml $.Values.worker.volumes | indent 8 }}
+    {{- if $.Values.worker.nodeSelector }}
+      nodeSelector:
+{{ toYaml $.Values.worker.nodeSelector | indent 8 }}
+    {{- end }}
+    {{- if $.Values.worker.hostAliases }}
+      hostAliases:
+{{ toYaml $.Values.worker.hostAliases | indent 8 }}
+    {{- end }}
+    {{- if $.Values.worker.dnsConfig }}
+      dnsConfig:
+{{ toYaml $.Values.worker.dnsConfig | indent 8 }}
+    {{- end }}
+    {{- if $.Values.worker.securityContext }}
+      securityContext:
+{{ toYaml $.Values.worker.securityContext | indent 8 }}
+    {{- end }}
+    {{- if $.Values.worker.tolerations }}
+      tolerations:
+{{ toYaml $.Values.worker.tolerations | indent 8 }}
+    {{- end }}
+    {{- if $.Values.worker.affinity }}
+      affinity:
+{{ toYaml $.Values.worker.affinity | indent 8 }}
+    {{- end }}
+
+{{- end }}
+
+
+{{- if .Values.master.enabled }}
+---
+apiVersion: {{ template "livestreamdecoding.deployment.apiVersion" . }}
+kind: Deployment
+metadata:
+  name: {{ template "livestreamdecoding.master.fullname" $dot }}
+{{ include "livestreamdecoding.namespace" $dot | indent 2 }}
+  labels:
+    {{- include "livestreamdecoding.master.labels" $dot | nindent 4 }}
+{{- if $.Values.master.deploymentAnnotations }}
+  annotations: {{ toYaml $.Values.master.deploymentAnnotations | nindent 4 }}
+{{- end }}
+spec:
+  replicas: {{ $.Values.master.replicaCount }}
+  {{- if $.Values.master.strategy }}
+  strategy:
+{{ toYaml $.Values.master.strategy | trim | indent 4 }}
+    {{ if eq $.Values.master.strategy.type "Recreate" }}rollingUpdate: null{{ end }}
+{{- end }}
+  selector:
+    matchLabels:
+      {{- include "livestreamdecoding.master.matchLabels" $dot | nindent 6 }}
+  template:
+    metadata:
+    {{- if $.Values.master.podAnnotations }}
+      annotations:
+        {{ toYaml $.Values.master.podAnnotations | nindent 8 }}
+    {{- end }}
+      labels:
+        {{- include "livestreamdecoding.master.matchLabels" $dot | nindent 8 }}
+        {{- if $.Values.master.podLabels}}
+        {{ toYaml $.Values.master.podLabels | nindent 8 }}
+        {{- end}}
+    spec:
+      {{- if $.Values.master.extraInitContainers }}
+      initContainers:
+{{ toYaml $.Values.master.extraInitContainers | indent 8 }}
+      {{- end }}
+      {{- if $.Values.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml $.Values.imagePullSecrets | indent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ template "livestreamdecoding.master.fullname" $dot }}
+          image: "{{ $.Values.master.image.repository }}:{{ $.Values.master.image.tag }}"
+          imagePullPolicy: "{{ $.Values.master.image.pullPolicy }}"
+          envFrom:
+            - secretRef:
+                name: online-asr-secret
+          {{- if $.Values.master.command }}
+          command:
+{{ toYaml $.Values.master.command | indent 12}}
+          {{- end }}
+          {{- if $.Values.master.env }}
+          env:
+{{ toYaml $.Values.master.env | indent 12}}
+          {{- end }}
+          {{- if $.Values.master.args }}
+          args:
+{{ toYaml $.Values.master.args | indent 12}}
+          {{- end }}
+          readinessProbe:
+            httpGet:
+                path: /
+                port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 5
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 5
+          resources: 
+{{ toYaml $.Values.master.resources | indent 12 }}
+          volumeMounts: {{- toYaml $.Values.master.volumeMounts | nindent 12 }}
+      volumes:
+{{ toYaml $.Values.master.volumes | indent 8 }}
+    {{- if $.Values.master.nodeSelector }}
+      nodeSelector:
+{{ toYaml $.Values.master.nodeSelector | indent 8 }}
+    {{- end }}
+    {{- if $.Values.master.hostAliases }}
+      hostAliases:
+{{ toYaml $.Values.master.hostAliases | indent 8 }}
+    {{- end }}
+    {{- if $.Values.master.dnsConfig }}
+      dnsConfig:
+{{ toYaml $.Values.master.dnsConfig | indent 8 }}
+    {{- end }}
+    {{- if $.Values.master.securityContext }}
+      securityContext:
+{{ toYaml $.Values.master.securityContext | indent 8 }}
+    {{- end }}
+    {{- if $.Values.master.tolerations }}
+      tolerations:
+{{ toYaml $.Values.master.tolerations | indent 8 }}
+    {{- end }}
+    {{- if $.Values.master.affinity }}
+      affinity:
+{{ toYaml $.Values.master.affinity | indent 8 }}
+    {{- end }}
+
+{{- end }}

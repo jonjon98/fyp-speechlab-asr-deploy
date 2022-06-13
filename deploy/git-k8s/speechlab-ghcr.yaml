@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ntuspeechlab-github-cr
+  # namespace: default
+type: kubernetes.io/dockerconfigjson
+data:
+  .dockerconfigjson: eyJhdXRocyI6eyJnaGNyLmlvIjp7InVzZXJuYW1lIjoibnR1c3BlZWNobGFiIiwicGFzc3dvcmQiOiJnaHBfOGJ6YjUyb09BQXlleFlDOHpjQnlWNjE1czNLdThjMk5Mb3hSIiwiZW1haWwiOiJ0bHZ1QG50dS5lZHUuc2ciLCJhdXRoIjoiYm5SMWMzQmxaV05vYkdGaU9tZG9jRjg0WW5waU5USnZUMEZCZVdWNFdVTTRlbU5DZVZZMk1UVnpNMHQxT0dNeVRreHZlRkk9In19fQ==
