@@ -1,14 +1,14 @@
 version: '2.1'
 services:
     decoding-sdk-server:
-        image: ghcr.io/ntuspeechlab/decoding-sdk:1.0
+        image: lyvt/decoding-sdk:1.0
         restart: unless-stopped
         ports:
             - "8010:8010"
         command: /home/speechuser/start_master.sh -p 8010
 
     decoding-sdk-worker:
-        image: ghcr.io/ntuspeechlab/decoding-sdk:1.0
+        image: lyvt/decoding-sdk:1.0
         restart: unless-stopped
         volumes:
             # mapping volumes
