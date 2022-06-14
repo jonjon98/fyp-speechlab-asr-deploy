@@ -32,8 +32,8 @@ master:
   ## Livestream Server container image
   ##
   image:
-    repository: ghcr.io/ntuspeechlab/decoding-sdk
-    tag: "1.0.0"
+    repository: lyvt/decoding-sdk
+    tag: "1.0"
     pullPolicy: Always
   ## Livestream Server priorityClassName
   ##
@@ -56,7 +56,7 @@ master:
   ##       key: username
   env: []
 
-  command: ["/tini", "--", "/home/speechuser/opt/start_master.sh"]
+  command: ["/tini", "--", "/home/speechuser/start_master.sh"]
 
   extraFlags:
     # - web.enable-lifecycle
@@ -216,7 +216,7 @@ worker:
   ## Livestream Hotword Decoder container image
   ##
   image:
-    repository: ghcr.io/ntuspeechlab/decoding-sdk
+    repository: lyvt/decoding-sdk
     tag: "1.0"
     pullPolicy: Always
 
