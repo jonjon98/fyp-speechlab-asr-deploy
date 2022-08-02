@@ -80,3 +80,20 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+strategy: "{}"
+
+status: "{}"
+
+### server-deployment ###
+serverDeploymentName: "decoding-sdk-server"
+
+serverDeploymentImage:
+  repository: lyvt/decoding-sdk
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "1.0"
+
+serverDeploymentContainerPort: 8010
+
+serverDeploymentArgs: [/home/speechuser/start_master.sh, -p, "8010"]

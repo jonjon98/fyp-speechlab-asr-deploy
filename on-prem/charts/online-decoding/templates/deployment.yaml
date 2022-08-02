@@ -1,61 +1,66 @@
+# Server deployment
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "online-decoding.fullname" . }}
+  name: {{ include "server-deployment.name" . }}
   labels:
-    {{- include "online-decoding.labels" . | nindent 4 }}
+    io.kompose.service: {{ include "server-deployment.name" . }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "online-decoding.selectorLabels" . | nindent 6 }}
+      io.kompose.service: {{ include "server-deployment.name" . }}
+  strategy: {{ .Values.strategy }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
-      annotations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
       labels:
-        {{- include "online-decoding.selectorLabels" . | nindent 8 }}
+        io.kompose.service: {{ include "server-deployment.name" . }}
     spec:
-      {{- with .Values.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      serviceAccountName: {{ include "online-decoding.serviceAccountName" . }}
-      securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ .Chart.Name }}
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+        - name: {{ include "server-deployment.name" . }}
+          image: {{ .Values.serverDeploymentImage.repository }}:{{ .Values.serverDeploymentImage.tag | default .Chart.AppVersion }}
+          imagePullPolicy: {{ .Values.serverDeploymentImage.pullPolicy }}
           ports:
-            - name: http
-              containerPort: 80
-              protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
-          readinessProbe:
-            httpGet:
-              path: /
-              port: http
+            - containerPort: {{ .Values.serverDeploymentContainerPort }}
+          args:
+            {{- toYaml .Values.serverDeploymentArgs | nindent 12 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-      {{- with .Values.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+    restartPolicy: Always
+status: {{ .Values.status }}
+
+---
+# Worker deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "server-deployment.name" . }}
+  labels:
+    io.kompose.service: {{ include "server-deployment.name" . }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      io.kompose.service: {{ include "server-deployment.name" . }}
+  strategy: {{ .Values.strategy }}
+  template:
+    metadata:
+      labels:
+        io.kompose.service: {{ include "server-deployment.name" . }}
+    spec:
+      containers:
+        - name: {{ include "server-deployment.name" . }}
+          image: {{ .Values.serverDeploymentImage.repository }}:{{ .Values.serverDeploymentImage.tag | default .Chart.AppVersion }}
+          imagePullPolicy: {{ .Values.serverDeploymentImage.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.serverDeploymentContainerPort }}
+          args:
+            {{- toYaml .Values.serverDeploymentArgs | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+    restartPolicy: Always
+status: {{ .Values.status }}
