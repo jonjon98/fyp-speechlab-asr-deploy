@@ -64,6 +64,13 @@ Create the name of the service account to use
 {{/*
 ### Create the name server-deployment ###
 */}}
-{{- define "server-deployment.name" -}}
+{{- define "serverDeployment.name" -}}
   {{- .Values.serverDeploymentName }}
+{{- end }}
+
+{{/*
+### Create the name worker-deployment ###
+*/}}
+{{- define "workerDeployment.name" -}}
+  {{- .Values.workerDeploymentName }}
 {{- end }}

@@ -81,19 +81,37 @@ tolerations: []
 
 affinity: {}
 
-strategy: "{}"
-
 status: "{}"
 
-### server-deployment ###
-serverDeploymentName: "decoding-sdk-server"
-
-serverDeploymentImage:
+### Deployment Image ###
+deploymentImage:
   repository: lyvt/decoding-sdk
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: "1.0"
 
+### server-deployment ###
+serverDeploymentName: "decoding-sdk-server"
+
+serverStrategy: "{}"
+
 serverDeploymentContainerPort: 8010
 
 serverDeploymentArgs: [/home/speechuser/start_master.sh, -p, "8010"]
+
+# Worker deployment
+workerDeploymentName: "decoding-sdk-worker"
+
+workerStrategy: Recreate
+
+workerDeploymentArgs: [/home/speechuser/start_worker.sh]
+
+workerEnv: 
+  name1: MASTER
+  value1: decoding-sdk-server:8010
+  name2: MODEL_DIR
+  value2: english
+
+workerVolumeMount:
+  mountPath: /opt/models/
+  name: decoding-sdk-worker-claim0
