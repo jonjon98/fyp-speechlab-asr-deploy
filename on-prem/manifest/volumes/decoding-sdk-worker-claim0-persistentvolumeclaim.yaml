@@ -1,16 +1,15 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  creationTimestamp: null
+  name: decoding-sdk-worker-claim0
   labels:
     io.kompose.service: decoding-sdk-worker-claim0
-  name: decoding-sdk-worker-claim0
 spec:
+  storageClassName: decoding-sdk-worker-storageclass
+  volumeName: decoding-sdk-worker-persistentvolume
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 100Mi
-  storageClassName: decoding-sdk-worker-storageclass
-  volumeName: decoding-sdk-worker-persistentvolume
 status: {}

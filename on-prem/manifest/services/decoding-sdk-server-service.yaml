@@ -1,16 +1,15 @@
 apiVersion: v1
 kind: Service
 metadata:
-  creationTimestamp: null
+  name: decoding-sdk-server
   labels:
     io.kompose.service: decoding-sdk-server
-  name: decoding-sdk-server
 spec:
+  selector:
+    io.kompose.service: decoding-sdk-server
   ports:
     - name: "8010"
       port: 8010
       targetPort: 8010
-  selector:
-    io.kompose.service: decoding-sdk-server
 status:
   loadBalancer: {}

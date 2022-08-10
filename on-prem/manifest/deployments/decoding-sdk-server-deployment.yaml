@@ -1,31 +1,28 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  creationTimestamp: null
+  name: decoding-sdk-server
   labels:
     io.kompose.service: decoding-sdk-server
-  name: decoding-sdk-server
 spec:
   replicas: 1
   selector:
     matchLabels:
       io.kompose.service: decoding-sdk-server
-  strategy: {}
   template:
     metadata:
-      creationTimestamp: null
       labels:
         io.kompose.service: decoding-sdk-server
     spec:
       containers:
-        - args:
+        - name: decoding-sdk-server
+          image: lyvt/decoding-sdk:1.0
+          ports:
+            - containerPort: 8010
+          args:
             - /home/speechuser/start_master.sh
             - -p
             - "8010"
-          image: lyvt/decoding-sdk:1.0
-          name: decoding-sdk-server
-          ports:
-            - containerPort: 8010
           resources: {}
       restartPolicy: Always
 status: {}
