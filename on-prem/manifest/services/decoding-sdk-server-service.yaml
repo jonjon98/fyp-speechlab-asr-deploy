@@ -4,7 +4,7 @@ metadata:
   name: on-prem-server-service
 spec:
   selector:
-    io.kompose.service: on-prem-server
+    podName: on-prem-server-pod
   ports:
     - name: "8010"
       port: 8010
