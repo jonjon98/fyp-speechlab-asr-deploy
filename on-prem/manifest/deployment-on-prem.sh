@@ -4,22 +4,22 @@ if [ "$1" = 'project' ]; then
     if [ "$2" = 'up' ]; then
         echo "Applying ASR project from K8s cluster"
 
-        kubectl apply -f services/decoding-sdk-server-service.yaml
-        kubectl apply -f deployments/decoding-sdk-server-deployment.yaml
-        kubectl apply -f volumes/decoding-sdk-worker-storageclass.yaml
-        kubectl apply -f volumes/decoding-sdk-worker-persistentvolume.yaml
-        kubectl apply -f volumes/decoding-sdk-worker-claim0-persistentvolumeclaim.yaml
-        kubectl apply -f deployments/decoding-sdk-worker-deployment.yaml
+        kubectl apply -f services/server.yaml
+        kubectl apply -f deployments/server.yaml
+        kubectl apply -f volumes/worker-storageclass.yaml
+        kubectl apply -f volumes/worker-pv.yaml
+        kubectl apply -f volumes/worker-pvc.yaml
+        kubectl apply -f deployments/worker.yaml
     
     elif  [ "$2" = 'down' ]; then
         echo "Removing ASR project from K8s cluster"
 
-        kubectl delete -f deployments/decoding-sdk-server-deployment.yaml
-        kubectl delete -f services/decoding-sdk-server-service.yaml
-        kubectl delete -f deployments/decoding-sdk-worker-deployment.yaml
-        kubectl delete -f volumes/decoding-sdk-worker-claim0-persistentvolumeclaim.yaml
-        kubectl delete -f volumes/decoding-sdk-worker-persistentvolume.yaml
-        kubectl delete -f volumes/decoding-sdk-worker-storageclass.yaml
+        kubectl delete -f deployments/server.yaml
+        kubectl delete -f services/server.yaml
+        kubectl delete -f deployments/worker.yaml
+        kubectl delete -f volumes/worker-pvc.yaml
+        kubectl delete -f volumes/worker-pv.yaml
+        kubectl delete -f volumes/worker-storageclass.yaml
 
     fi
 
@@ -27,12 +27,12 @@ elif  [ "$1" = 'ingress-controller' ]; then
     if [ "$2" = 'up' ]; then
         echo "Applying ASR Ingress Controller from K8s cluster"
 
-        kubectl apply -f ingress/ingress-nginx-controller.yaml
+        kubectl apply -f ingress/nginx-controller.yaml
 
     elif  [ "$2" = 'down' ]; then
         echo "Removing ASR Ingress Controller from K8s cluster"
 
-        kubectl delete -f ingress/ingress-nginx-controller.yaml
+        kubectl delete -f ingress/nginx-controller.yaml
 
     fi
 
@@ -40,12 +40,12 @@ elif  [ "$1" = 'ingress-resource' ]; then
     if [ "$2" = 'up' ]; then
         echo "Applying ASR Ingress Resource from K8s cluster"
 
-        kubectl apply -f ingress/decoding-sdk-server-ingress.yaml
+        kubectl apply -f ingress/server-resource.yaml
 
     elif  [ "$2" = 'down' ]; then
         echo "Removing ASR Ingress Resource from K8s cluster"
 
-        kubectl delete -f ingress/decoding-sdk-server-ingress.yaml
+        kubectl delete -f ingress/server-resource.yaml
 
     fi
 
