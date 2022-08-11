@@ -1,12 +1,10 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: decoding-sdk-worker-claim0
-  labels:
-    io.kompose.service: decoding-sdk-worker-claim0
+  name: on-prem-worker-pvc
 spec:
-  storageClassName: decoding-sdk-worker-storageclass
-  volumeName: decoding-sdk-worker-persistentvolume
+  storageClassName: on-prem-worker-storageclass
+  volumeName: on-prem-worker-pv
   accessModes:
     - ReadWriteOnce
   resources:
