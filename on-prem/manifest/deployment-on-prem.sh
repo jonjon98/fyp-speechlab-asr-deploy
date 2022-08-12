@@ -27,12 +27,12 @@ elif  [ "$1" = 'ingress-controller' ]; then
     if [ "$2" = 'up' ]; then
         echo "Applying ASR Ingress Controller from K8s cluster"
 
-        kubectl apply -f ingress/nginx-controller.yaml
+        kubectl apply -f ingresses/nginx-controller.yaml
 
     elif  [ "$2" = 'down' ]; then
         echo "Removing ASR Ingress Controller from K8s cluster"
 
-        kubectl delete -f ingress/nginx-controller.yaml
+        kubectl delete -f ingresses/nginx-controller.yaml
 
     fi
 
@@ -40,12 +40,12 @@ elif  [ "$1" = 'ingress-resource' ]; then
     if [ "$2" = 'up' ]; then
         echo "Applying ASR Ingress Resource from K8s cluster"
 
-        kubectl apply -f ingress/server-resource.yaml
+        kubectl apply -f ingresses/server-resource.yaml
 
     elif  [ "$2" = 'down' ]; then
         echo "Removing ASR Ingress Resource from K8s cluster"
 
-        kubectl delete -f ingress/server-resource.yaml
+        kubectl delete -f ingresses/server-resource.yaml
 
     fi
 
