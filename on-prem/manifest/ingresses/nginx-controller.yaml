@@ -399,7 +399,7 @@ spec:
         kubernetes.io/os: linux
       serviceAccountName: ingress-nginx
       terminationGracePeriodSeconds: 300
-      hostNetwork: true
+      hostNetwork: true # needed until external load balancer MetalLB is used
       volumes:
         - name: webhook-cert
           secret:
