@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "on-prem.server.ingress.resource.name" . }}
+spec:
+  ingressClassName: {{ toYaml .Values.server.ingressResource.ingressClassName }}
+  rules:
+  - host: {{ toYaml .Values.server.ingressResource.host }}
+    http:
+      paths:
+      - path: {{ toYaml .Values.server.ingressResource.path }}
+        pathType: {{ toYaml .Values.server.ingressResource.pathType }}
+        backend: 
+          service:
+            name: {{ include "on-prem.server.service.name" . }}
+            port: 
+              number: {{ toYaml .Values.server.ingressResource.port }}

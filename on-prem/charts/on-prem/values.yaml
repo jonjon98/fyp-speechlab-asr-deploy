@@ -1,0 +1,127 @@
+# Default values for on-prem.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+################################### dont touch this yet this is required for NOTES.txt to render
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+service:
+  type: ClusterIP
+  port: 80
+######################################
+
+namespace: default
+
+nameOverride: ""
+fullnameOverride: ""
+
+server:
+  # container deployment Image 
+  image:
+    repository: lyvt/decoding-sdk
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "1.0"
+    pullPolicy: Always
+
+  # Server specs
+  replicaCount: 1
+
+  # Server container specs
+  containerPort: 8010
+
+  args: [/home/speechuser/start_master.sh, -p, "8010"]
+
+  resources: {}
+
+  # Server deployment template restart policy
+  restartPolicy: Always
+  
+  # Server deployment status
+  status: {}
+
+  # Server service
+  service:
+    ports:
+      name: 8010
+      servicePort: 8010
+      targetPort: 8010
+    status: 
+      loadBalancer: {}
+
+  # Ingress resource
+  ingressResource:
+    ingressClassName: nginx
+    host: asr-project.com
+    path: /
+    pathType: Prefix
+    port: 8010
+
+worker:
+  # Container deployment Image
+  image:
+    repository: lyvt/decoding-sdk
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "1.0"
+    pullPolicy: Always
+
+  # Worker specs
+  replicaCount: 1
+
+  strategy: 
+    type: Recreate
+
+  # Worker container specs
+  args: [/home/speechuser/start_worker.sh]
+
+  env: 
+    name1: MASTER
+    value1: on-prem-server-service:8010
+    name2: MODEL_DIR
+    value2: english
+
+  # worker volume mounts
+  volumeMount:
+    # name: on-prem-worker-pvc
+    mountPath: /opt/models/
+
+  resources: {}
+
+  # Worker deployment template restart policy
+  restartPolicy: Always
+  
+  # Worker deployment status
+  status: {}
+
+  # Worker storage class
+  storageClass:
+    provisioner: kubernetes.io/no-provisioner
+    volumeBindingMode: WaitForFirstConsumer
+
+  # Worker PVC
+  PVC:
+    accessModes: ReadWriteOnce
+    size: 100Mi
+    status: {}
+
+  PV: 
+    accessModes: ReadWriteOnce
+    mountPath: /home/asr-user/worker1-dir/models
+    size: 100Mi
+    # Values to assign pod to specific node
+    key: kubernetes.io/hostname
+    operator: In
+    nodeName: asr-serve000001

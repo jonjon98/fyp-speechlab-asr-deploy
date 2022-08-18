@@ -1,0 +1,38 @@
+# Worker deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "on-prem.worker.deployment.name" . }}
+spec:
+  replicas: {{ toYaml .Values.worker.replicaCount }}
+  selector:
+    matchLabels:
+      podName: {{ include "on-prem.worker.pod.name" . }}
+  strategy: 
+    type: {{ toYaml .Values.worker.strategy.type }}
+  template:
+    metadata:
+      labels:
+        podName: {{ include "on-prem.worker.pod.name" . }}
+    spec:
+      containers:
+        - name: {{ include "on-prem.worker.container.name" . }}
+          image: {{ toYaml .Values.worker.image.repository }}:{{ .Values.worker.image.tag | default .Chart.AppVersion }}
+          imagePullPolicy: {{ .Values.worker.image.pullPolicy }}
+          args:
+            {{- toYaml .Values.worker.args | nindent 12 }}
+          env:
+            - name: {{ toYaml .Values.worker.env.name1 }}
+              value: {{ toYaml .Values.worker.env.value1 }}
+            - name: {{ toYaml .Values.worker.env.name2 }}
+              value: {{ toYaml .Values.worker.env.value2 }}
+          volumeMounts:
+            - mountPath: {{ toYaml .Values.worker.volumeMount.mountPath }}
+              name: {{ include "on-prem.worker.pvc.name" . }}            
+          resources: {{ toYaml .Values.worker.resources }}
+      restartPolicy: Always
+      volumes:
+        - name: {{ include "on-prem.worker.pvc.name" . }} 
+          persistentVolumeClaim:
+            claimName: {{ include "on-prem.worker.pvc.name" . }} 
+status: {{ toYaml .Values.worker.status }}

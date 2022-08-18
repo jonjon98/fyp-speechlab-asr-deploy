@@ -10,14 +10,15 @@ spec:
   capacity:
     storage: 100Mi
   accessModes:
-  - ReadWriteOnce
+    - ReadWriteOnce
   local:
     path: /home/asr-user/worker1-dir/models
+  # Assign this pod to the worker-node
   nodeAffinity:
     required:
       nodeSelectorTerms:
-      - matchExpressions:
-        - key: kubernetes.io/hostname
-          operator: In
-          values:
-          - asr-serve000001
+        - matchExpressions:
+          - key: kubernetes.io/hostname
+            operator: In
+            values:
+              - asr-serve000001

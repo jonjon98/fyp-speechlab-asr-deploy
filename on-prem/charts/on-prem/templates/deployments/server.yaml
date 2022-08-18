@@ -1,0 +1,26 @@
+# Server deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "on-prem.server.deployment.name" . }}
+spec:
+  replicas: {{ toYaml .Values.server.replicaCount }}
+  selector:
+    matchLabels:
+      podName: {{ include "on-prem.server.pod.name" . }}
+  template:
+    metadata:
+      labels:
+        podName: {{ include "on-prem.server.pod.name" . }}
+    spec:
+      containers:
+        - name: {{ include "on-prem.server.container.name" . }}
+          image: {{ toYaml .Values.server.image.repository }}:{{ .Values.server.image.tag | default .Chart.AppVersion }}
+          imagePullPolicy: {{ toYaml .Values.server.image.pullPolicy }}
+          ports:
+            - containerPort: {{ toYaml .Values.server.containerPort }}
+          args:
+            {{- toYaml .Values.server.args | nindent 12 }}
+          resources: {{ toYaml .Values.server.resources }}
+      restartPolicy: Always
+status: {{ toYaml .Values.server.status }}

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "on-prem.server.service.name" . }}
+spec:
+  selector:
+    podName: {{ include "on-prem.server.pod.name" . }}
+  ports:
+    - name: {{ toYaml .Values.server.service.ports.name | quote }}
+      port: {{ toYaml .Values.server.service.ports.servicePort }}
+      targetPort: {{ toYaml .Values.server.service.ports.targetPort }}
+status:
+  loadBalancer: {{ toYaml .Values.server.service.status.loadBalancer }}

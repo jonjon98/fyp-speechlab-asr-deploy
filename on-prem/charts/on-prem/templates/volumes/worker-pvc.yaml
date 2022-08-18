@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "on-prem.worker.pvc.name" . }}
+spec:
+  storageClassName: {{ include "on-prem.worker.storageclass.name" . }}
+  volumeName: {{ include "on-prem.worker.pv.name" . }}
+  accessModes:
+    - {{ toYaml .Values.worker.PVC.accessModes }}
+  resources:
+    requests:
+      storage: {{ toYaml .Values.worker.PVC.size }}
+status: {{ toYaml .Values.worker.PVC.status }}

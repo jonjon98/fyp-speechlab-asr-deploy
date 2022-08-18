@@ -15,6 +15,7 @@ spec:
       containers:
         - name: on-prem-server-container
           image: lyvt/decoding-sdk:1.0
+          imagePullPolicy: Always
           ports:
             - containerPort: 8010
           args:
