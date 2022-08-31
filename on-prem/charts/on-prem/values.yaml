@@ -40,6 +40,9 @@ server:
   # Server specs
   replicaCount: 1
 
+  # Server deployment status
+  status: {}
+
   # Server container specs
   containerPort: 8010
 
@@ -47,11 +50,8 @@ server:
 
   resources: {}
 
-  # Server deployment template restart policy
+  # Server container restart policy
   restartPolicy: Always
-  
-  # Server deployment status
-  status: {}
 
   # Server service
   service:
@@ -84,15 +84,16 @@ worker:
   strategy: 
     type: Recreate
 
+  # Worker deployment status
+  status: {}
+
   # Worker container specs
   args: [/home/speechuser/start_worker.sh]
-
+################################################
   env: # find a better way to do this
-    name1: MASTER
-    value1: on-prem-server-service:8010 # try to make this dynamic by linking it to the _helpers.tpl file
-    name2: MODEL_DIR
-    value2: english
-
+    MASTER: on-prem-server-service:8010
+    MODEL_DIR: english
+################################################
   # worker volume mounts
   volumeMount:
     # name: on-prem-worker-pvc
@@ -100,11 +101,8 @@ worker:
 
   resources: {}
 
-  # Worker deployment template restart policy
+  # Worker container restart policy
   restartPolicy: Always
-  
-  # Worker deployment status
-  status: {}
 
   # Worker storage class
   storageClass:

@@ -6,8 +6,8 @@ spec:
   selector:
     podName: {{ include "on-prem.server.pod.name" . }}
   ports:
-    - name: {{ toYaml .Values.server.service.ports.name | quote }}
-      port: {{ toYaml .Values.server.service.ports.servicePort }}
-      targetPort: {{ toYaml .Values.server.service.ports.targetPort }}
+    - name: {{ include "on-prem.server.service.ports.name" . }}
+      port: {{ include "on-prem.server.service.ports.servicePort" . }}
+      targetPort: {{ include "on-prem.server.service.ports.targetPort" . }}
 status:
-  loadBalancer: {{ toYaml .Values.server.service.status.loadBalancer }}
+  loadBalancer: {{ include "on-prem.server.service.status.loadBalancer" . }}

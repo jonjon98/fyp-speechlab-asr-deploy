@@ -3,15 +3,15 @@ kind: Ingress
 metadata:
   name: {{ include "on-prem.server.ingress.resource.name" . }}
 spec:
-  ingressClassName: {{ toYaml .Values.server.ingressResource.ingressClassName }}
+  ingressClassName: {{ include "on-prem.server.ingressResource.ingressClassName" . }}
   rules:
-    - host: {{ toYaml .Values.server.ingressResource.host }}
+    - host: {{ include "on-prem.server.ingressResource.host" . }}
       http:
         paths:
-          - path: {{ toYaml .Values.server.ingressResource.path }}
-            pathType: {{ toYaml .Values.server.ingressResource.pathType }}
+          - path: {{ include "on-prem.server.ingressResource.path" . }}
+            pathType: {{ include "on-prem.server.ingressResource.pathType" . }}
             backend: 
               service:
                 name: {{ include "on-prem.server.service.name" . }}
                 port: 
-                  number: {{ toYaml .Values.server.ingressResource.port }}
+                  number: {{ include "on-prem.server.ingressResource.port" . }}

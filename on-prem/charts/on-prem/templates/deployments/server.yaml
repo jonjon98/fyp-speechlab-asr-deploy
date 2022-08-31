@@ -4,7 +4,7 @@ kind: Deployment
 metadata:
   name: {{ include "on-prem.server.deployment.name" . }}
 spec:
-  replicas: {{ toYaml .Values.server.replicaCount }}
+  replicas: {{ include "on-prem.server.replicaCount" . }}
   selector:
     matchLabels:
       podName: {{ include "on-prem.server.pod.name" . }}
@@ -15,12 +15,12 @@ spec:
     spec:
       containers:
         - name: {{ include "on-prem.server.container.name" . }}
-          image: {{ toYaml .Values.server.image.repository }}:{{ .Values.server.image.tag | default .Chart.AppVersion }}
-          imagePullPolicy: {{ toYaml .Values.server.image.pullPolicy }}
+          image: {{ include "on-prem.server.image.repository" . }}:{{ include "on-prem.server.image.tag" . }}
+          imagePullPolicy: {{ include "on-prem.server.image.pullPolicy" . }}
           ports:
-            - containerPort: {{ toYaml .Values.server.containerPort }}
+            - containerPort: {{ include "on-prem.server.containerPort" . }}
           args:
-            {{- toYaml .Values.server.args | nindent 12 }}
-          resources: {{ toYaml .Values.server.resources }}
-      restartPolicy: Always
-status: {{ toYaml .Values.server.status }}
+            {{- include "on-prem.server.args" . }}
+          resources: {{ include "on-prem.server.resources" . }}
+      restartPolicy: {{ include "on-prem.server.restartPolicy" . }}
+status: {{ include "on-prem.server.status" . }}

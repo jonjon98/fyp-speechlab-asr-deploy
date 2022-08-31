@@ -4,12 +4,12 @@ kind: Deployment
 metadata:
   name: {{ include "on-prem.worker.deployment.name" . }}
 spec:
-  replicas: {{ toYaml .Values.worker.replicaCount }}
+  replicas: {{ include "on-prem.worker.replicaCount" . }}
   selector:
     matchLabels:
       podName: {{ include "on-prem.worker.pod.name" . }}
   strategy: 
-    type: {{ toYaml .Values.worker.strategy.type }}
+    type: {{ include "on-prem.worker.strategy.type" . }}
   template:
     metadata:
       labels:
@@ -17,22 +17,19 @@ spec:
     spec:
       containers:
         - name: {{ include "on-prem.worker.container.name" . }}
-          image: {{ toYaml .Values.worker.image.repository }}:{{ .Values.worker.image.tag | default .Chart.AppVersion }}
-          imagePullPolicy: {{ .Values.worker.image.pullPolicy }}
+          image: {{ include "on-prem.worker.image.repository" . }}:{{ include "on-prem.worker.image.tag" . }}
+          imagePullPolicy: {{ include "on-prem.worker.image.pullPolicy" . }}
           args:
-            {{- toYaml .Values.worker.args | nindent 12 }}
+            {{- include "on-prem.worker.args" . }}
           env:
-            - name: {{ toYaml .Values.worker.env.name1 }}
-              value: {{ toYaml .Values.worker.env.value1 }}
-            - name: {{ toYaml .Values.worker.env.name2 }}
-              value: {{ toYaml .Values.worker.env.value2 }}
+            {{- include "on-prem.worker.env" . }}  
           volumeMounts:
-            - mountPath: {{ toYaml .Values.worker.volumeMount.mountPath }}
+            - mountPath: {{ include "on-prem.worker.volumeMount.mountPath" . }}
               name: {{ include "on-prem.worker.pvc.name" . }}            
-          resources: {{ toYaml .Values.worker.resources }}
-      restartPolicy: Always
+          resources: {{ include "on-prem.worker.resources" . }} 
+      restartPolicy: {{ include "on-prem.worker.restartPolicy" . }} 
       volumes:
         - name: {{ include "on-prem.worker.pvc.name" . }} 
           persistentVolumeClaim:
             claimName: {{ include "on-prem.worker.pvc.name" . }} 
-status: {{ toYaml .Values.worker.status }}
+status: {{ include "on-prem.worker.status" . }} 

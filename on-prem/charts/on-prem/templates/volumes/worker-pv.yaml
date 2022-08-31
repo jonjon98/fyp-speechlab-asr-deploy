@@ -6,19 +6,19 @@ spec:
   storageClassName: {{ include "on-prem.worker.storageclass.name" . }}
   claimRef:
     name: {{ include "on-prem.worker.pvc.name" . }}
-    namespace: {{ toYaml .Values.namespace }}
+    namespace: {{ include "on-prem.namespace" . }}
   capacity:
-    storage: {{ toYaml .Values.worker.PV.size }}
+    storage: {{ include "on-prem.worker.PV.size" . }}
   accessModes:
-    - {{ toYaml .Values.worker.PV.accessModes }}
+    - {{ include "on-prem.worker.PV.accessModes" . }}
   local:
-    path: {{ toYaml .Values.worker.PV.mountPath }}
+    path: {{ include "on-prem.worker.PV.mountPath" . }}
   # Assign this pod to the worker-node
   nodeAffinity:
     required:
       nodeSelectorTerms:
         - matchExpressions:
-          - key: {{ toYaml .Values.worker.PV.key }}
-            operator: {{ toYaml .Values.worker.PV.operator }}
+          - key: {{ include "on-prem.worker.PV.key" . }}
+            operator: {{ include "on-prem.worker.PV.operator" . }}
             values:
-              - {{ toYaml .Values.worker.PV.nodeName }}
+              - {{ include "on-prem.worker.PV.nodeName" . }}

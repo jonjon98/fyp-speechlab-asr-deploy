@@ -2,5 +2,5 @@ kind: StorageClass
 apiVersion: storage.k8s.io/v1
 metadata:
   name: {{ include "on-prem.worker.storageclass.name" . }}
-provisioner: {{ toYaml .Values.worker.storageClass.provisioner }}
-volumeBindingMode: {{ toYaml .Values.worker.storageClass.volumeBindingMode }}
+provisioner: {{ include "on-prem.worker.storageClass.provisioner" . }}
+volumeBindingMode: {{ include "on-prem.worker.storageClass.volumeBindingMode" . }}

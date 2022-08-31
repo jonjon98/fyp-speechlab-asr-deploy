@@ -6,8 +6,8 @@ spec:
   storageClassName: {{ include "on-prem.worker.storageclass.name" . }}
   volumeName: {{ include "on-prem.worker.pv.name" . }}
   accessModes:
-    - {{ toYaml .Values.worker.PVC.accessModes }}
+    - {{ include "on-prem.worker.PVC.accessModes" . }}
   resources:
     requests:
-      storage: {{ toYaml .Values.worker.PVC.size }}
-status: {{ toYaml .Values.worker.PVC.status }}
+      storage: {{ include "on-prem.worker.PVC.size" . }}
+status: {{ include "on-prem.worker.PVC.status" . }}
