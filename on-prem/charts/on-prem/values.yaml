@@ -89,11 +89,11 @@ worker:
 
   # Worker container specs
   args: [/home/speechuser/start_worker.sh]
-################################################
-  env: # find a better way to do this
+
+  env:
     MASTER: on-prem-server-service:8010
     MODEL_DIR: english
-################################################
+
   # worker volume mounts
   volumeMount:
     # name: on-prem-worker-pvc

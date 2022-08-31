@@ -298,14 +298,14 @@ Create the name of the service account to use
 {{- define "on-prem.worker.args" -}} 
   {{ default .Values.worker.args | toYaml | nindent 12 }}
 {{- end -}}
-################################################
+
 {{- define "on-prem.worker.env" -}} 
   {{- range $name, $item := .Values.worker.env -}}
     {{- printf "- name: %s\n" $name | nindent 12 -}}
     {{- printf "value: %s\n" $item | nindent 14 -}}
   {{- end -}}
 {{- end -}}
-################################################
+
 # worker volume mounts
 {{- define "on-prem.worker.volumeMount.mountPath" -}}
   {{- if .Values.worker.volumeMount -}}
