@@ -6,7 +6,7 @@ spec:
   storageClassName: {{ include "on-prem.worker.storageclass.name" . }}
   claimRef:
     name: {{ include "on-prem.worker.pvc.name" . }}
-    namespace: {{ include "on-prem.namespace" . }}
+    namespace: {{ .Release.Namespace }}
   capacity:
     storage: {{ include "on-prem.worker.PV.size" . }}
   accessModes:

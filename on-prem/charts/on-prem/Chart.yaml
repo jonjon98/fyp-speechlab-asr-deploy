@@ -1,6 +1,6 @@
 apiVersion: v2
 name: on-prem
-description: A Helm chart for Kubernetes
+description: The helm chart for the on-prem deployment of the ASR project 
 
 # A chart can be either an 'application' or a 'library' chart.
 #

@@ -24,9 +24,13 @@ service:
   port: 80
 ######################################
 
-namespace: default
-
+## @param nameOverride String to override on-prem.name
+## it would partially override generated name
+##
 nameOverride: ""
+## @param fullnameOverride String to override on-prem.fullname
+## it would fully override generated name
+##
 fullnameOverride: ""
 
 server:
