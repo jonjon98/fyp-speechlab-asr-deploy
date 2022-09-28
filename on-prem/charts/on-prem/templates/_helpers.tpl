@@ -2,8 +2,8 @@
 Expand the name of the chart.
 */}}
 {{- define "on-prem.name" -}}
-{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
-{{- end }}
+  {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
 
 {{/*
 Create a default fully qualified app name.
@@ -23,50 +23,6 @@ If release name contains chart name it will be used as a full name.
 {{- end }}
 {{- end }}
 
-{{/*
-Create chart name and version as used by the chart label.
-*/}}
-{{- define "on-prem.chart" -}}
-{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
-{{- end }}
-
-{{/*
-Common labels
-*/}}
-{{- define "on-prem.labels" -}}
-helm.sh/chart: {{ include "on-prem.chart" . }}
-{{ include "on-prem.selectorLabels" . }}
-{{- if .Chart.AppVersion }}
-app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
-{{- end }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
-{{- end }}
-
-{{/*
-Selector labels
-*/}}
-{{- define "on-prem.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "on-prem.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
-{{- end }}
-
-{{/*
-Create the name of the service account to use
-*/}}
-{{- define "on-prem.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "on-prem.fullname" .) .Values.serviceAccount.name }}
-{{- else }}
-{{- default "default" .Values.serviceAccount.name }}
-{{- end }}
-{{- end }}
-
-### Namespace Definition
-{{- define "on-prem.namespace" -}}
-  {{ default "default" .Values.namespace }}
-{{- end -}}
-
-
 ### Server Definitions ###
 ### Define server deployment assets ###
 {{- define "on-prem.server.deployment.name" -}}
@@ -83,27 +39,15 @@ Create the name of the service account to use
 
 # container deployment Image
 {{- define "on-prem.server.image.repository" -}}
-  {{- if .Values.server.image -}}
-    {{ default "lyvt/decoding-sdk" .Values.server.image.repository }}
-  {{- else -}}
-    {{ default "lyvt/decoding-sdk" }}
-  {{- end -}}
+  {{ default "lyvt/decoding-sdk" .Values.server.image.repository }}
 {{- end -}}
 
 {{- define "on-prem.server.image.tag" -}}
-  {{- if .Values.server.image -}}
-    {{ default .Chart.AppVersion .Values.server.image.tag }}
-  {{- else -}}
-    {{ default .Chart.AppVersion }}
-  {{- end -}}
+  {{ default .Chart.AppVersion .Values.server.image.tag }}
 {{- end -}}
 
 {{- define "on-prem.server.image.pullPolicy" -}}
-  {{- if .Values.server.image -}}
-    {{ default "Always" .Values.server.image.pullPolicy }}
-  {{- else -}}
-    {{ default "Always" }}
-  {{- end -}}
+  {{ default "Always" .Values.server.image.pullPolicy }}
 {{- end -}}
 
 # Server specs
@@ -142,52 +86,20 @@ Create the name of the service account to use
 
 # Server services ports
 {{- define "on-prem.server.service.ports.name" -}}
-  {{- if .Values.server.service -}}
-    {{- if .Values.server.service.ports -}}
-      {{ default 8010 .Values.server.service.ports.name | quote }}
-    {{- else -}}
-      {{ default 8010 | quote }}
-    {{- end -}}
-  {{- else -}}
-    {{ default 8010 | quote }}
-  {{- end -}}
+  {{ default 8010 .Values.server.service.ports.name | quote }}
 {{- end -}}
 
 {{- define "on-prem.server.service.ports.servicePort" -}}
-  {{- if .Values.server.service -}}
-    {{- if .Values.server.service.ports -}}
-      {{ default 8010 .Values.server.service.ports.servicePort }}
-    {{- else -}}
-      {{ default 8010 }}
-    {{- end -}}
-  {{- else -}}
-    {{ default 8010 }}
-  {{- end -}}
+  {{ default 8010 .Values.server.service.ports.servicePort }}
 {{- end -}}
 
 {{- define "on-prem.server.service.ports.targetPort" -}}
-  {{- if .Values.server.service -}}
-    {{- if .Values.server.service.ports -}}
-      {{ default 8010 .Values.server.service.ports.targetPort }}
-    {{- else -}}
-      {{ default 8010 }}
-    {{- end -}}
-  {{- else -}}
-    {{ default 8010 }}
-  {{- end -}}
+  {{ default 8010 .Values.server.service.ports.targetPort }}
 {{- end -}}
 
 # Server services status
 {{- define "on-prem.server.service.status.loadBalancer" -}}
-  {{- if .Values.server.service -}}
-    {{- if .Values.server.service.status -}}
-      {{ default "{}" .Values.server.service.status.loadBalancer }}
-    {{- else -}}
-      {{ default "{}" }}
-    {{- end -}}
-  {{- else -}}
-    {{ default "{}" }}
-  {{- end -}}
+  {{ default "{}" .Values.server.service.status.loadBalancer }}
 {{- end -}}
 
 ### Define server deployment ingress resource ###
@@ -196,43 +108,23 @@ Create the name of the service account to use
 {{- end -}}
 
 {{- define "on-prem.server.ingressResource.ingressClassName" -}}
-  {{- if .Values.server.ingressResource -}}
-    {{ default "nginx" .Values.server.ingressResource.ingressClassName }}
-  {{- else -}}
-    {{ default "nginx" }}
-  {{- end -}}
+  {{ default "nginx" .Values.server.ingressResource.ingressClassName }}
 {{- end -}}
 
 {{- define "on-prem.server.ingressResource.host" -}}
-  {{- if .Values.server.ingressResource -}}
-    {{ default "asr-project.com" .Values.server.ingressResource.host }}
-  {{- else -}}
-    {{ default "asr-project.com" }}
-  {{- end -}}
+  {{ default "asr-project.com" .Values.server.ingressResource.host }}
 {{- end -}}
 
 {{- define "on-prem.server.ingressResource.path" -}}
-  {{- if .Values.server.ingressResource -}}
-    {{ default "/" .Values.server.ingressResource.path }}
-  {{- else -}}
-    {{ default "/" }}
-  {{- end -}}
+  {{ default "/" .Values.server.ingressResource.path }}
 {{- end -}}
 
 {{- define "on-prem.server.ingressResource.pathType" -}}
-  {{- if .Values.server.ingressResource -}}
-    {{ default "Prefix" .Values.server.ingressResource.pathType }}
-  {{- else -}}
-    {{ default "Prefix" }}
-  {{- end -}}
+  {{ default "Prefix" .Values.server.ingressResource.pathType }}
 {{- end -}}
 
 {{- define "on-prem.server.ingressResource.port" -}}
-  {{- if .Values.server.ingressResource -}}
-    {{ default 8010 .Values.server.ingressResource.port }}
-  {{- else -}}
-    {{ default 8010 }}
-  {{- end -}}
+  {{ default 8010 .Values.server.ingressResource.port }}
 {{- end -}}
 
 
@@ -252,27 +144,15 @@ Create the name of the service account to use
 
 # container deployment Image
 {{- define "on-prem.worker.image.repository" -}}
-  {{- if .Values.worker.image -}}
-    {{ default "lyvt/decoding-sdk" .Values.worker.image.repository }}
-  {{- else -}}
-    {{ default "lyvt/decoding-sdk" }}
-  {{- end -}}
+  {{ default "lyvt/decoding-sdk" .Values.worker.image.repository }}
 {{- end -}}
 
 {{- define "on-prem.worker.image.tag" -}}
-  {{- if .Values.worker.image -}}
-    {{ default .Chart.AppVersion .Values.worker.image.tag }}
-  {{- else -}}
-    {{ default .Chart.AppVersion }}
-  {{- end -}}
+  {{ default .Chart.AppVersion .Values.worker.image.tag }}
 {{- end -}}
 
 {{- define "on-prem.worker.image.pullPolicy" -}}
-  {{- if .Values.worker.image -}}
-    {{ default "Always" .Values.worker.image.pullPolicy }}
-  {{- else -}}
-    {{ default "Always" }}
-  {{- end -}}
+  {{ default "Always" .Values.worker.image.pullPolicy }}
 {{- end -}}
 
 # Worker specs
@@ -281,11 +161,7 @@ Create the name of the service account to use
 {{- end -}}
 
 {{- define "on-prem.worker.strategy.type" -}}
-  {{- if .Values.worker.strategy -}}
-    {{ default "Recreate" .Values.worker.strategy.type }}
-  {{- else -}}
-    {{ default "Recreate" }}
-  {{- end -}}
+  {{ default "Recreate" .Values.worker.strategy.type }}
 {{- end -}}
 
 # Worker deployment status
@@ -308,11 +184,7 @@ Create the name of the service account to use
 
 # worker volume mounts
 {{- define "on-prem.worker.volumeMount.mountPath" -}}
-  {{- if .Values.worker.volumeMount -}}
     {{ default "/opt/models/" .Values.worker.volumeMount.mountPath }}
-  {{- else -}}
-    {{ default "/opt/models/" }}
-  {{- end -}}
 {{- end -}}
 
 {{- define "on-prem.worker.resources" -}}
@@ -332,19 +204,11 @@ Create the name of the service account to use
 {{- end -}}
 
 {{- define "on-prem.worker.storageClass.provisioner" -}}
-  {{- if .Values.worker.storageClass -}}
-    {{ default "kubernetes.io/no-provisioner" .Values.worker.storageClass.provisioner }}
-  {{- else -}}
-    {{ default "kubernetes.io/no-provisioner" }}
-  {{- end -}}
+  {{ default "kubernetes.io/no-provisioner" .Values.worker.storageClass.provisioner }}
 {{- end -}}
 
 {{- define "on-prem.worker.storageClass.volumeBindingMode" -}}
-  {{- if .Values.worker.storageClass -}}
-    {{ default "WaitForFirstConsumer" .Values.worker.storageClass.volumeBindingMode }}
-  {{- else -}}
-    {{ default "WaitForFirstConsumer" }}
-  {{- end -}}
+  {{ default "WaitForFirstConsumer" .Values.worker.storageClass.volumeBindingMode }}
 {{- end -}}
 
 # Worker PVC
@@ -353,27 +217,15 @@ Create the name of the service account to use
 {{- end -}}
 
 {{- define "on-prem.worker.PVC.accessModes" -}}
-  {{- if .Values.worker.PVC -}}
-    {{ default "ReadWriteOnce" .Values.worker.PVC.accessModes }}
-  {{- else -}}
-    {{ default "ReadWriteOnce" }}
-  {{- end -}}
+  {{ default "ReadWriteOnce" .Values.worker.PVC.accessModes }}
 {{- end -}}
 
 {{- define "on-prem.worker.PVC.size" -}}
-  {{- if .Values.worker.PVC -}}
-    {{ default "100Mi" .Values.worker.PVC.size }}
-  {{- else -}}
-    {{ default "100Mi" }}
-  {{- end -}}
+  {{ default "100Mi" .Values.worker.PVC.size }}
 {{- end -}}
 
 {{- define "on-prem.worker.PVC.status" -}}
-  {{- if .Values.worker.PVC -}}
-    {{ default "{}" .Values.worker.PVC.status }}
-  {{- else -}}
-    {{ default "{}" }}
-  {{- end -}}
+  {{ default "{}" .Values.worker.PVC.status }}
 {{- end -}}
 
 # Worker PV
@@ -382,49 +234,25 @@ Create the name of the service account to use
 {{- end -}}
 
 {{- define "on-prem.worker.PV.accessModes" -}}
-  {{- if .Values.worker.PV -}}
-    {{ default "ReadWriteOnce" .Values.worker.PV.accessModes }}
-  {{- else -}}
-    {{ default "ReadWriteOnce" }}
-  {{- end -}}
+  {{ default "ReadWriteOnce" .Values.worker.PV.accessModes }}
 {{- end -}}
 
 {{- define "on-prem.worker.PV.mountPath" -}}
-  {{- if .Values.worker.PV -}}
-    {{ default "/home/asr-user/worker1-dir/models" .Values.worker.PV.mountPath }}
-  {{- else -}}
-    {{ default "/home/asr-user/worker1-dir/models" }}
-  {{- end -}}
+  {{ default "/home/asr-user/worker1-dir/models" .Values.worker.PV.mountPath }}
 {{- end -}}
 
 {{- define "on-prem.worker.PV.size" -}}
-  {{- if .Values.worker.PV -}}
-    {{ default "100Mi" .Values.worker.PV.size }}
-  {{- else -}}
-    {{ default "100Mi" }}
-  {{- end -}}
+  {{ default "100Mi" .Values.worker.PV.size }}
 {{- end -}}
 
 {{- define "on-prem.worker.PV.key" -}}
-  {{- if .Values.worker.PV -}}
-    {{ default "kubernetes.io/hostname" .Values.worker.PV.key }}
-  {{- else -}}
-    {{ default "kubernetes.io/hostname" }}
-  {{- end -}}
+  {{ default "kubernetes.io/hostname" .Values.worker.PV.key }}
 {{- end -}}
 
 {{- define "on-prem.worker.PV.operator" -}}
-  {{- if .Values.worker.PV -}}
-    {{ default "In" .Values.worker.PV.operator }}
-  {{- else -}}
-    {{ default "In" }}
-  {{- end -}}
+  {{ default "In" .Values.worker.PV.operator }}
 {{- end -}}
 
 {{- define "on-prem.worker.PV.nodeName" -}}
-  {{- if .Values.worker.PV -}}
-    {{ default "asr-serve000001" .Values.worker.PV.nodeName }}
-  {{- else -}}
-    {{ default "asr-serve000001" }}
-  {{- end -}}
+  {{ default "asr-serve000001" .Values.worker.PV.nodeName }}
 {{- end -}}
