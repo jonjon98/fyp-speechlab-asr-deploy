@@ -15,10 +15,10 @@ if [ "$1" = 'master' ]; then
   sudo kubeadm init --pod-network-cidr=10.244.0.0/16 --cri-socket=/run/containerd/containerd.sock > kube_details.txt 
     
   mkdir -p $HOME/.kube
-  sudo cp -i /etc/kubernetes/admin.conf /home/ubuntu/.kube/config
-  vim ~/.kube/config 
+  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  #vim ~/.kube/config 
   sudo chown -R $(id -u):$(id -g) $HOME/.kube/config
-  kubectl taint nodes --all node-role.kubernetes.io/master-
+  kubectl taint nodes --all node-role.kubernetes.io/control-plane- #kubectl taint nodes --all node-role.kubernetes.io/master-
   kubectl get nodes
   kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
   kubectl get nodes

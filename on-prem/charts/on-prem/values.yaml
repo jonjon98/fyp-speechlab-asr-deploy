@@ -16,7 +16,7 @@ server:
   image:
     repository: lyvt/decoding-sdk
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "1.0"
+    tag: "1.2"
     pullPolicy: Always
 
   # Server specs
@@ -30,7 +30,12 @@ server:
 
   args: [/home/speechuser/start_master.sh, -p, "8010"]
 
-  resources: {}
+  resources: 
+    limits:
+      memory: 6Gi
+    requests:
+      cpu: 1000m
+      memory: 6Gi
 
   # Server container restart policy
   restartPolicy: Always
@@ -57,7 +62,7 @@ worker:
   image:
     repository: lyvt/decoding-sdk
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "1.0"
+    tag: "1.2"
     pullPolicy: Always
 
   # Worker specs
@@ -75,13 +80,19 @@ worker:
   env:
     MASTER: on-prem-server-service:8010
     MODEL_DIR: english
+    INSTANCE_NUM: "2"
 
   # worker volume mounts
   volumeMount:
     # name: on-prem-worker-pvc
     mountPath: /opt/models/
 
-  resources: {}
+  resources:
+    limits:
+      memory: 6Gi
+    requests:
+      cpu: 1000m
+      memory: 6Gi
 
   # Worker container restart policy
   restartPolicy: Always
@@ -94,14 +105,14 @@ worker:
   # Worker PVC
   PVC:
     accessModes: ReadWriteOnce
-    size: 100Mi
+    size: 20Gi
     status: {}
 
   PV: 
     accessModes: ReadWriteOnce
-    mountPath: /home/asr-user/worker1-dir/models
-    size: 100Mi
+    mountPath: /home/fyp-jonathan/worker1-dir/models
+    size: 20Gi
     # Values to assign pod to specific node
     key: kubernetes.io/hostname
     operator: In
-    nodeName: asr-serve000001
+    nodeName: micl-server03

@@ -69,8 +69,21 @@ If release name contains chart name it will be used as a full name.
   {{ default .Values.server.args | toYaml | nindent 12 }}
 {{- end -}}
 
+# server pod resources
 {{- define "on-prem.server.resources" -}}
   {{ default "{}" .Values.server.resources }}
+{{- end -}}
+
+{{- define "on-prem.server.resources.limits.memory" -}}
+  {{ default "{}" .Values.server.resources.limits.memory }}
+{{- end -}}
+
+{{- define "on-prem.server.resources.requests.cpu" -}}
+  {{ default "{}" .Values.server.resources.requests.cpu }}
+{{- end -}}
+
+{{- define "on-prem.server.resources.requests.memory" -}}
+  {{ default "{}" .Values.server.resources.requests.memory }}
 {{- end -}}
 
 # Server container restart policy
@@ -187,8 +200,21 @@ If release name contains chart name it will be used as a full name.
     {{ default "/opt/models/" .Values.worker.volumeMount.mountPath }}
 {{- end -}}
 
+# worker pod resources
 {{- define "on-prem.worker.resources" -}}
   {{ default "{}" .Values.worker.resources }}
+{{- end -}}
+
+{{- define "on-prem.worker.resources.limits.memory" -}}
+  {{ default "{}" .Values.worker.resources.limits.memory }}
+{{- end -}}
+
+{{- define "on-prem.worker.resources.requests.cpu" -}}
+  {{ default "{}" .Values.worker.resources.requests.cpu }}
+{{- end -}}
+
+{{- define "on-prem.worker.resources.requests.memory" -}}
+  {{ default "{}" .Values.worker.resources.requests.memory }}
 {{- end -}}
 
 # Worker container restart policy

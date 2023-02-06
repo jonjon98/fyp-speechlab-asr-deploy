@@ -8,11 +8,11 @@ spec:
     name: on-prem-worker-pvc
     namespace: default
   capacity:
-    storage: 100Mi
+    storage: 20Gi
   accessModes:
     - ReadWriteOnce
   local:
-    path: /home/asr-user/worker1-dir/models
+    path: /home/fyp-jonathan/worker1-dir/models #/home/asr-user/worker1-dir/models
   # Assign this pod to the worker-node
   nodeAffinity:
     required:
@@ -21,4 +21,4 @@ spec:
           - key: kubernetes.io/hostname
             operator: In
             values:
-              - asr-serve000001
+              - micl-server03 #asr-serve000001

@@ -21,6 +21,11 @@ spec:
             - containerPort: {{ include "on-prem.server.containerPort" . }}
           args:
             {{- include "on-prem.server.args" . }}
-          resources: {{ include "on-prem.server.resources" . }}
+          resources:
+            limits: 
+              memory: {{ include "on-prem.server.resources.limits.memory" . }}
+            requests:
+              cpu: {{ include "on-prem.server.resources.requests.cpu" . }}
+              memory: {{ include "on-prem.server.resources.requests.memory" . }}
       restartPolicy: {{ include "on-prem.server.restartPolicy" . }}
 status: {{ include "on-prem.server.status" . }}

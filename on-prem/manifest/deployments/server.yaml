@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: on-prem-server-container
-          image: lyvt/decoding-sdk:1.0
+          image: lyvt/decoding-sdk:1.2
           imagePullPolicy: Always
           ports:
             - containerPort: 8010
@@ -22,6 +22,11 @@ spec:
             - /home/speechuser/start_master.sh
             - -p
             - "8010"
-          resources: {}
+          resources: 
+            limits:
+              memory: 6Gi
+            requests:
+              cpu: 1000m
+              memory: 6Gi
       restartPolicy: Always
 status: {}

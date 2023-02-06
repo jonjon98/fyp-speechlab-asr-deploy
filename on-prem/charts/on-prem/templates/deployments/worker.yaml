@@ -26,7 +26,12 @@ spec:
           volumeMounts:
             - mountPath: {{ include "on-prem.worker.volumeMount.mountPath" . }}
               name: {{ include "on-prem.worker.pvc.name" . }}            
-          resources: {{ include "on-prem.worker.resources" . }} 
+          resources:
+            limits: 
+              memory: {{ include "on-prem.worker.resources.limits.memory" . }}
+            requests:
+              cpu: {{ include "on-prem.worker.resources.requests.cpu" . }}
+              memory: {{ include "on-prem.worker.resources.requests.memory" . }}
       restartPolicy: {{ include "on-prem.worker.restartPolicy" . }} 
       volumes:
         - name: {{ include "on-prem.worker.pvc.name" . }} 

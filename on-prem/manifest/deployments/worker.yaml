@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: on-prem-worker-container
-          image: lyvt/decoding-sdk:1.0
+          image: lyvt/decoding-sdk:1.2
           imagePullPolicy: Always
           args:
             - /home/speechuser/start_worker.sh
@@ -25,10 +25,17 @@ spec:
               value: on-prem-server-service:8010
             - name: MODEL_DIR
               value: english
+            - name: INSTANCE_NUM
+              value: "2"
           volumeMounts:
             - mountPath: /opt/models/
               name: on-prem-worker-pvc
-          resources: {}
+          resources: 
+            limits:
+              memory: 6Gi
+            requests:
+              cpu: 1000m
+              memory: 6Gi
       restartPolicy: Always
       volumes:
         - name: on-prem-worker-pvc
