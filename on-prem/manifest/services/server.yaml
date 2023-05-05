@@ -10,6 +10,6 @@ spec:
       port: 8010
       targetPort: 8010
 status:
-  loadBalancer: {}
-    #ingress:
-    #- ip: asr-project.com # or ip of the endpoints/ingress if DNS is not configured
+  loadBalancer: #{}
+    ingress:
+    - ip: 172.21.47.111 #asr-project.com # or ip of the endpoints/ingress if DNS is not configured
